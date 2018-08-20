@@ -7,9 +7,17 @@ class Cell():
     def __init__(self, value: Optional[Union[int, str]] = None, status: str = 'covered') -> None:
         self.value = value
         self.status = status
+        self.row = None
+        self.col = None
     
     def __str__(self):
         return f'<Cell: {self.value} {self.status}>'
+    
+    def is_in_list(self, ls: List) -> bool:
+        for i in ls:
+            if i.row == self.row and i.col == self.col:
+                return True
+        return False
 
 
 class Board():
@@ -70,6 +78,14 @@ class Board():
                 res.append(cell)
         return res
     
+    @staticmethod
+    def append_unique_neighbor(neighbor: Cell, list_of_neighbors: List[Cell]) -> None:
+        '''Append a neighbor cell to a list only if it's not already in that list'''
+        for i in list(list_of_neighbors):
+            if i.row == neighbor.row and i.col == neighbor.col:
+                return
+        list_of_neighbors.append(neighbor)
+    
     def compile(self):
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
@@ -97,7 +113,8 @@ class Game():
     def start(self, row: int, col: int):
         while True:  # Avoid losing the game before it even starts
             board = Board(16, 16, 40)
-            if board.get_cell(row, col) != 'b':
+            if board.get_cell(row, col).value != 'b':
+            # if board.get_cell(row, col).value == 0:
                 break
         self.board = board
         self.board.compile()
@@ -106,15 +123,26 @@ class Game():
     
     def uncover_cell(self, row: int, col: int):
         cell = self.board.set_cell(row, col, status='uncovered')
-        if cell != None:  # self.__check()
+        if cell != None:
             if cell.value == 'b':
                 self.__loose()
                 return
-        # TODO: Uncover neighbors
-        # neighbors = self.board.get_neighbors(row, col)
-        # for i in neighbors:
-        #     if i.value == 0:
-        #         self.uncover_cell(i.row, i.col)
+            if cell.value == 0:
+                # Uncover neighbors (and nighbors of neighbors etc...)
+                neighbors = self.board.get_neighbors(row, col)
+                neighbors_to_uncover = neighbors
+                uncovered_neighbors = []
+                c = 0
+                while len(neighbors_to_uncover) > 0:
+                    print(f'iteration {c}: {len(neighbors_to_uncover)}')
+                    n = neighbors_to_uncover.pop(0)
+                    n = self.board.set_cell(n.row, n.col, status='uncovered')
+                    uncovered_neighbors.append(n)
+                    if n.value == 0:
+                        for i in self.board.get_neighbors(n.row, n.col):
+                            if not i.is_in_list(neighbors_to_uncover) and not i.is_in_list(uncovered_neighbors):
+                                neighbors_to_uncover.append(i)
+                    c += 1
     
     def mark_cell_as_bomb(self, row: int, col: int):
         pass
