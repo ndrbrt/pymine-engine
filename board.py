@@ -1,16 +1,24 @@
 from typing import Union, Optional, List
 import random
+from enum import Enum
+
+
+class Status(Enum):
+    COVERED = 1
+    UNCOVERED = 2
+    MARKED_BOMB = 3
+    MARKED_DOUBT = 4
 
 
 class Cell():
-    def __init__(self, value: Optional[Union[int, str]] = None, status: str = 'covered') -> None:
+    def __init__(self, value: Optional[Union[int, str]] = None, status: Status = Status.COVERED) -> None:
         self.value = value
         self.status = status
         self.row = None
         self.col = None
     
     def __str__(self):
-        return f'<Cell: {self.value} {self.status}>'
+        return f'<Cell: {self.value} {self.status.name.lower()}>'
     
     def is_in_list(self, ls: List) -> bool:
         for i in ls:
@@ -22,6 +30,7 @@ class Cell():
 class Board():
     def __init__(self, rows: int, cols: int, number_of_bombs: int) -> None:
         self.number_of_cells = rows * cols
+        self.number_of_bombs = number_of_bombs
         self.rows = rows
         self.cols = cols
         self.board = [Cell('s') for i in range(self.number_of_cells)]
@@ -53,7 +62,7 @@ class Board():
     
     def set_cell(self, row: int, col: int,
         value: Optional[Union[int, str]] = None,
-        status: Optional[Union[int, str]] = None) -> Optional[Cell]:
+        status: Optional[Status] = None) -> Optional[Cell]:
         res = None
         f = lambda x: x if x >= 0 else None
         try:
