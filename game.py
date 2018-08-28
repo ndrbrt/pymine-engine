@@ -35,9 +35,16 @@ class Game():
         self.start_time = time.time()
         self.uncover_cell(row, col)
     
-    def uncover_cell(self, row: int, col: int) -> Optional[Union[Cell, List[Cell]]]:
-        # if self.board.get_cell(row, col).status == Status.UNCOVERED:
-        #     return
+    def uncover_cell(self, row: int, col: int) -> Optional[Union[List[Cell]]]:
+        '''
+        Uncover a given cell if it's not uncovered already.
+        If given cell's value is 0, then it also uncovers the neighbors
+        of the given cell, and the neighbors of the neighbors recursively.
+
+        Return a list with all the cells uncovered.
+        '''
+        if self.board.get_cell(row, col).status == Status.UNCOVERED:
+            return
         cell = self.board.set_cell(row, col, status=Status.UNCOVERED)
         if cell != None:
             if cell.value == 'b':
@@ -50,25 +57,30 @@ class Game():
                 self.uncovered_cells += cells
                 return cells
             self.uncovered_cells.append(cell)
-            return cell
+            return [cell]
     
+    # TODO: it works but could be written better
     def __uncover_neighbors(self, row: int, col: int) -> List[Cell]:
+        '''
+        Uncover neighbors recursively.
+
+        Returns a list of uncovered neighbors
+        '''
         neighbors = self.board.get_neighbors(row, col)
-        neighbors_to_uncover = neighbors
+        neighbors_to_uncover = [n for n in neighbors if n != 'b']
         uncovered_neighbors = []
-        # c = 0
+
         while len(neighbors_to_uncover) > 0:
-            # print(f'iteration {c}: {len(neighbors_to_uncover)}')
             n = neighbors_to_uncover.pop(0)
-            # if n.status == Status.UNCOVERED:
-            #     break
-            n = self.board.set_cell(n.row, n.col, status=Status.UNCOVERED)
-            uncovered_neighbors.append(n)
-            if n.value == 0:
-                for i in self.board.get_neighbors(n.row, n.col):
-                    if not i.is_in_list(neighbors_to_uncover) and not i.is_in_list(uncovered_neighbors):
-                        neighbors_to_uncover.append(i)
-            # c += 1
+
+            if n.status != Status.UNCOVERED:
+                n = self.board.set_cell(n.row, n.col, status=Status.UNCOVERED)
+                uncovered_neighbors.append(n)
+                if n.value == 0:
+                    new_neighbors_to_uncover = [n for n in self.board.get_neighbors(n.row, n.col) if n != 'b']
+                    for i in new_neighbors_to_uncover:
+                        if not i.is_in_list(neighbors_to_uncover) and not i.is_in_list(uncovered_neighbors):
+                            neighbors_to_uncover.append(i)
         return uncovered_neighbors
     
     def mark_cell_as_bomb(self, row: int, col: int) -> Optional[Cell]:
