@@ -1,6 +1,12 @@
 from typing import Union, Optional, List
 import time
 from .board import Board, Cell, Status
+from enum import Enum
+
+
+class Outcome(Enum):
+    WIN = 1
+    LOST = 2
 
 
 class Game():
@@ -10,6 +16,8 @@ class Game():
         self.number_of_bombs = number_of_bombs
         self.moves = []
         self.uncovered_cells = []
+        self.is_over = False
+        self.outcome = None
 
     def __str__(self):
         res = ''
@@ -49,9 +57,9 @@ class Game():
             return
         cell = self.board.set_cell(row, col, status=Status.UNCOVERED)
         if cell != None:
-            if cell.value == 'b':
-                self.__loose()
-                return
+            # if cell.value == 'b':  # no more needed, since __is_lost method is implemented - TODO consider if using __is_lost or keep using this
+            #     self.__loose()
+            #     return
             if cell.value == 0:
                 # Uncover neighbors (and nighbors of neighbors with value == 0, etc...)
                 uncovered_neighbors = self.__uncover_neighbors(row, col)
@@ -102,25 +110,39 @@ class Game():
     
     def unmark_cell(self, row: int, col: int) -> Optional[Cell]:
         cell = self.board.get_cell(row, col)
-        if cell != None and cell.status != Status.UNCOVERED:
+        if cell != None and cell.status == Status.UNCOVERED:
             cell = self.board.set_cell(row, col, status=Status.COVERED)
         return cell
     
-    def __check(self):
-        pass
+    def check(self) -> Optional[Outcome]:
+        if self.__is_lost():
+            self.__loose()
+            return Outcome.LOST
+        elif self.__is_win():
+            self.__win()
+            return Outcome.WIN
     
+    def __is_lost(self):
+        uncovered_cells_values = [cell.value for cell in self.uncovered_cells]
+        return 'b' in uncovered_cells_values
+
     def __is_win(self):
+        '''
+        This method must be called only by self.check(),
+        that checks first if the game is not lost.
+        That is because in self.uncovered_cells there could be cells with
+        value == 'b' (so they are bombs). In such a scenario, this method
+        could return True even though the game is actually lost.
+        '''
         return len(self.uncovered_cells) == self.board.number_of_cells - self.board.number_of_bombs
     
     def __win(self):
-        return False
+        self.__end(Outcome.WIN)
     
     def __loose(self):
-        return False
+        self.__end(Outcome.LOST)
     
-    def __end(self, outcome: str):
+    def __end(self, outcome: Outcome):
         self.end_time = time.time()
-        if outcome == 'win':
-            pass
-        elif outcome == 'lost':
-            pass
+        self.outcome = outcome
+        self.is_over = True
