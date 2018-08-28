@@ -39,10 +39,12 @@ class Board():
         self.__as_matrix()
     
     def __str__(self):
-        board = []
+        res = ''
         for row in self.board:
-            board.append([cell.value for cell in row])
-        return str(board)
+            for cell in row:
+                res += f'[{cell.value}]'
+            res += '\n'
+        return res[:-1]  # skip the last \n
     
     def __as_matrix(self):
         matrix = []

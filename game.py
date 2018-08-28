@@ -12,17 +12,19 @@ class Game():
         self.uncovered_cells = []
 
     def __str__(self):
-        board = []
-        for row in range(len(self.board.board)):
-            prow = []
-            for col in range(len(self.board.board[row])):
-                cell = self.board.get_cell(row, col)
+        res = ''
+        for row in self.board.board:
+            for cell in row:
                 if cell.status == Status.COVERED:
-                    prow.append('-')
+                    res += '[ ]'
+                elif cell.status == Status.MARKED_BOMB:
+                    res += '[f]'
+                elif cell.status == Status.MARKED_DOUBT:
+                    res += '[?]'
                 else:
-                    prow.append(cell.value)
-            board.append(prow)
-        return str(board)
+                    res += f'[{cell.value}]'
+            res += '\n'
+        return res[:-1]  # skip the last \n
 
     def start(self, row: int, col: int):
         while True:  # Avoid losing the game before it even starts
