@@ -31,9 +31,10 @@ class Board():
     def __init__(self, rows: int, cols: int, number_of_bombs: int) -> None:
         self.number_of_cells = rows * cols
         self.number_of_bombs = number_of_bombs
+        self.number_of_safe_cells = self.number_of_cells - number_of_bombs
         self.rows = rows
         self.cols = cols
-        self.board = [Cell('s') for i in range(self.number_of_cells)]
+        self.board = [Cell('s') for i in range(self.number_of_safe_cells)]
         self.board += [Cell('b') for i in range(number_of_bombs)]
         random.shuffle(self.board)
         self.__as_matrix()

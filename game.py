@@ -37,11 +37,11 @@ class Game():
     def start(self, row: int, col: int):
         while True:  # Avoid losing the game before it even starts
             board = Board(self.rows, self.cols, self.number_of_bombs)
-            # TODO start with a zero cell
-            if board.get_cell(row, col).value != 'b':
+            board.compile()
+            # Start with a zero cell
+            if board.get_cell(row, col).value == 0:
                 break
         self.board = board
-        self.board.compile()
         self.start_time = time.time()
         self.uncover_cell(row, col)
     
