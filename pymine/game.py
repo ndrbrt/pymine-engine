@@ -22,6 +22,11 @@ class Game():
 
     def __str__(self):
         res = ''
+        if self.board == None:
+            for row in range(self.rows):
+                res += '[ ]' * self.cols + '\n'
+            return res
+        
         for row in self.board.board:
             for cell in row:
                 if cell.status == Status.COVERED:

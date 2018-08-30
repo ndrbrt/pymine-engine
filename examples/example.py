@@ -25,6 +25,7 @@ def main():
 
     # Start the game
     g = Game(9,9,10)
+    print(g)
     starting_cell = input('Your move: ').split(',')
     row, col = int(starting_cell[0]), int(starting_cell[1])
     g.start(row, col)
