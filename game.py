@@ -18,6 +18,7 @@ class Game():
         self.uncovered_cells = []
         self.is_over = False
         self.outcome = None
+        self.board = None
 
     def __str__(self):
         res = ''
@@ -53,7 +54,10 @@ class Game():
 
         Return a list with all the cells uncovered.
         '''
-        if self.board.get_cell(row, col).status == Status.UNCOVERED:
+        cell = self.board.get_cell(row, col)
+        if cell == None:
+            return
+        if cell.status == Status.UNCOVERED:
             return
         cell = self.board.set_cell(row, col, status=Status.UNCOVERED)
         if cell != None:
@@ -110,8 +114,8 @@ class Game():
     
     def unmark_cell(self, row: int, col: int) -> Optional[Cell]:
         cell = self.board.get_cell(row, col)
-        if cell != None and cell.status == Status.UNCOVERED:
-            cell = self.board.set_cell(row, col, status=Status.COVERED)
+        if cell != None and cell.status != Status.UNCOVERED:
+            self.board.set_cell(row, col, status=Status.COVERED)
         return cell
     
     def check(self) -> Optional[Outcome]:
