@@ -21,5 +21,5 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Games/Entertainment :: Puzzle Games',
     ],
-    packages=['pymine-engine']
+    packages=['pymine']
 )
