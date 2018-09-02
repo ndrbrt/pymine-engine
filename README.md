@@ -14,7 +14,6 @@ Here is a simple example of the usage:
 
 ```python
 >>> from pymine import Game
-
 >>> g = Game(9,9,10)
 >>> g.start(5,5)
 >>> print(g)
@@ -52,9 +51,75 @@ Because of this, every time you uncover a cell, you should check the game. Do so
 >>> g.check()
 ```
 
-The `check()` method, returns None if the game is neither win nor lost, or an Outcome object otherwise.
+The `check()` method, returns None if the game is neither win nor lost (i.e. is not over yet), or an Outcome object otherwise.
+To know if the game is over and if it's win or lost you can look at the returning value of this method, or you can just check Game object's `is_over` attribute, that is `True` when the game is actually over, and the `outcome` attribute.
+
+```python
+>>> check = g.check()
+>>> if check is not None: print(f'* Outcome: {check.name} *')
+```
+
+```python
+>>> check()
+>>> if g.is_over: print(f'* Outcome: {g.outcome.name} *')
+```
 
 ## API
+
+### Game
+
+To instantiate a Game object with a number of rows, columns and bombs passed as parameters: `Game(rows, columns, bombs)`.
+Once you have a Game object instantiated, you can call the following methods and attributes:
+
+#### Methods
+
+- `start(row, column)`
+Starts the game within the cell located at coordinates (`row`, `column`). That means it creates a board that, at those coordinates, has a cell whose value is 0 (i.e. all of its 8 neighbors are **not** bombs); it sets the attribute `start_time` at the current time and finally calls the `uncover_cell` method, passing the actual cell's coordinates as parameters.
+
+- `uncover_cell(row, column)`
+Sets a cell's status as uncovered (where cell is the cell located at coordinates (`row`, `column`), and *uncovered* refers to `Status.UNCOVERED`).
+If the cell's value is 0, then it also uncovers the cell's neighbors. For any of the uncovered neighbors whose value is 0, its neighbors are uncovered too and so on, recursively.
+Returns `None` if there's no cell at the given coordinates or if the cell is already uncovered; otherwise a list with all of the uncovered cells (the current one and all of the uncovered neighbors, if any).
+
+- `mark_cell_as_bomb(row, column)`
+Sets a cell's status as `Status.MARKED_BOMB` (if the cell has not been uncovered already).
+Returns the cell.
+
+- `mark_cell_as_doubt(row, column)`
+Sets a cell's status as `Status.MARKED_DOUBT` (if the cell has not been uncovered already).
+Returns the cell.
+
+- `unmark_cell(row, column)`
+Sets a cell's status just as `Status.COVERED` (if the cell has not been uncovered already).
+Returns the cell.
+
+- `check()`
+Checks if the game is either win or lost. If so, it sets the attributes `end_time` to the current time, `outcome` to an Outcome object representig the actual outcome and `is_over` to `True`.
+Returns `None` if the game is not over (neither win nor lost); `Outcome.WIN` if the game is win; `Outcome.LOST` if the game is lost.
+
+#### Attributes
+
+- `rows`
+Number of rows in the game's board.
+
+- `cols`
+Number or columns in the game's board.
+
+- `number_of_bombs`
+Number of bombs in the game's board.
+
+- `uncovered_cells`
+List of cell's whose status is `Status.UNCOVERED`.
+
+- `is_over`
+`True` if the game has been win or lost; `False` otherwise.
+
+- `outcome`
+`None` if the game is not over; `Outcome.WIN` or `Outcome.LOST` otherwise.
+
+- `board`
+An instance of the Board class, representing the actual game's board.
+
 
 ## Example
 
