@@ -2,7 +2,7 @@ from typing import Union, Optional, List
 import random
 from enum import Enum
 
-
+# TODO move Status and Cell in cell.py
 class Status(Enum):
     COVERED = 1
     UNCOVERED = 2

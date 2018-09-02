@@ -1,5 +1,7 @@
 # pymine-engine
 
+A backend engine to implement the Minesweeper game in Python(3). It computes the logic behind the game and exposes an API that you can use to build your frontend.
+
 ## Installation
 
 ```shell
@@ -7,8 +9,6 @@ $ pip install https://github.com/ndrbrt/pymine-engine/archive/master.zip
 ```
 
 ## Usage
-
-A backend engine to implement the Minesweeper game in Python(3). It computes the logic behind the game and exposes an API that you can use to build your frontend.
 
 Here is a simple example of the usage:
 
@@ -23,7 +23,7 @@ The code above initialize a Game object `g`, with a board that has 9 rows, 9 col
 
 After that, it starts the game on cell with coordinates (5,5) that is row 5, column 5. The `start` method compiles the board to have a "zero cell" in the given coordinates, then uncovers that cell and its neighbors (more details on this below).
 
-The third statement prints the game, that is it prints the board with the actual uncovered or flagged cells. Note: this utility is mostly useful when using the package interactively in a shell, mainly for debug purposes. (If you actually want to display the board, showing all the cells' values either they are covered or uncovered, you can do so with `print(g.board)`)
+The third statement prints the game, that is it prints the board with the actual uncovered or flagged cells. Note: this utility is mostly useful when using the package interactively in a shell, mainly for debugging purposes. (If you actually want to display the board instead of the game, showing all the cells' values either they are covered or uncovered, you can do so with `print(g.board)`)
 
 Once the game is started, you have three possible actions you can accompish: uncover a cell, mark it as a bomb cell, or mark it as doubt.
 
@@ -42,10 +42,10 @@ To uncover a cell, just use
 >>> g.uncover_cell(7,7)
 ```
 
-Now, marking a cell, actually, is just helpful for whom is playing the game, but has nothing to do with logic of the game itself.
+Now, marking a cell, actually, is just helpful for whom is playing the game, but has nothing to do with the logic of the game itself.
 On the contrary, the action for uncover a cell is a key action that can determine if we win or lost. Every time we uncover a cell we could end up winning the game (if we correctly uncovered all the cells that are not bombs) or loosing it (if we uncover a cell that is actually a bomb).
 
-Because of this, every time you uncover a cell, you should check the game. Do so with
+Because of this, **every time you uncover a cell, you should check the game**. Do so with
 
 ```python
 >>> g.check()
@@ -55,8 +55,8 @@ The `check()` method, returns None if the game is neither win nor lost (i.e. is 
 To know if the game is over and if it's win or lost you can look at the returning value of this method, or you can just check Game object's `is_over` attribute, that is `True` when the game is actually over, and the `outcome` attribute.
 
 ```python
->>> check = g.check()
->>> if check is not None: print(f'* Outcome: {check.name} *')
+>>> outcome = g.check()
+>>> if outcome is not None: print(f'* Outcome: {outcome.name} *')
 ```
 
 ```python
@@ -109,7 +109,7 @@ Number or columns in the game's board.
 Number of bombs in the game's board.
 
 - `uncovered_cells`
-List of cell's whose status is `Status.UNCOVERED`.
+List of cells whose status is `Status.UNCOVERED`.
 
 - `is_over`
 `True` if the game has been win or lost; `False` otherwise.
@@ -119,6 +119,33 @@ List of cell's whose status is `Status.UNCOVERED`.
 
 - `board`
 An instance of the Board class, representing the actual game's board.
+
+### Cell
+- `value`
+- `status`
+- `row`
+- `col`
+
+### Board
+- `board`
+- `number_of_cells`
+- `number_of_bombs`
+- `number_of_safe_cells`
+- `rows`
+- `cols`
+- `get_cell(row, column)`
+
+### Status (Enum)
+Import it from `pymine.board`
+- `COVERED`
+- `UNCOVERED`
+- `MARKED_BOMB`
+- `MARKED_DOUBT`
+
+### Outcome (Enum)
+Import it from `pymine.game`
+- `WIN`
+- `LOST`
 
 
 ## Example
