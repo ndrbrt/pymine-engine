@@ -142,6 +142,7 @@ class Game():
         That is because in self.uncovered_cells there could be cells with
         value == 'b' (so they are bombs). In such a scenario, this method
         could return True even though the game is actually lost.
+        We could check that, but the __is_lost() method already does.
         '''
         return len(self.uncovered_cells) == self.board.number_of_cells - self.board.number_of_bombs
     

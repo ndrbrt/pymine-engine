@@ -19,7 +19,7 @@ Here is a simple example of the usage:
 >>> print(g)
 ```
 
-The code above initialize a Game object `g`, with a board that has 9 rows, 9 columns (then 81 cells) and 10 bombs.
+The code above initializes a Game object `g`, with a board that has 9 rows, 9 columns (then 81 cells) and 10 bombs.
 
 After that, it starts the game on cell with coordinates (5,5) that is row 5, column 5. The `start` method compiles the board to have a "zero cell" in the given coordinates, then uncovers that cell and its neighbors (more details on this below).
 
@@ -60,7 +60,7 @@ To know if the game is over and if it's win or lost you can look at the returnin
 ```
 
 ```python
->>> check()
+>>> g.check()
 >>> if g.is_over: print(f'* Outcome: {g.outcome.name} *')
 ```
 
@@ -73,70 +73,85 @@ Once you have a Game object instantiated, you can call the following methods and
 
 #### Methods
 
-- `start(row, column)`
+- `start(row, column)`<br />
 Starts the game within the cell located at coordinates (`row`, `column`). That means it creates a board that, at those coordinates, has a cell whose value is 0 (i.e. all of its 8 neighbors are **not** bombs); it sets the attribute `start_time` at the current time and finally calls the `uncover_cell` method, passing the actual cell's coordinates as parameters.
 
-- `uncover_cell(row, column)`
+- `uncover_cell(row, column)`<br />
 Sets a cell's status as uncovered (where cell is the cell located at coordinates (`row`, `column`), and *uncovered* refers to `Status.UNCOVERED`).
 If the cell's value is 0, then it also uncovers the cell's neighbors. For any of the uncovered neighbors whose value is 0, its neighbors are uncovered too and so on, recursively.
 Returns `None` if there's no cell at the given coordinates or if the cell is already uncovered; otherwise a list with all of the uncovered cells (the current one and all of the uncovered neighbors, if any).
 
-- `mark_cell_as_bomb(row, column)`
+- `mark_cell_as_bomb(row, column)`<br />
 Sets a cell's status as `Status.MARKED_BOMB` (if the cell has not been uncovered already).
-Returns the cell.
+Returns the Cell object representing cell at (row, column).
 
-- `mark_cell_as_doubt(row, column)`
+- `mark_cell_as_doubt(row, column)`<br />
 Sets a cell's status as `Status.MARKED_DOUBT` (if the cell has not been uncovered already).
-Returns the cell.
+Returns the Cell object representing cell at (row, column).
 
-- `unmark_cell(row, column)`
+- `unmark_cell(row, column)`<br />
 Sets a cell's status just as `Status.COVERED` (if the cell has not been uncovered already).
-Returns the cell.
+Returns the Cell object representing cell at (row, column).
 
-- `check()`
+- `check()`<br />
 Checks if the game is either win or lost. If so, it sets the attributes `end_time` to the current time, `outcome` to an Outcome object representig the actual outcome and `is_over` to `True`.
 Returns `None` if the game is not over (neither win nor lost); `Outcome.WIN` if the game is win; `Outcome.LOST` if the game is lost.
 
 #### Attributes
 
-- `rows`
+- `rows`<br />
 Number of rows in the game's board.
 
-- `cols`
+- `cols`<br />
 Number or columns in the game's board.
 
-- `number_of_bombs`
+- `number_of_bombs`<br />
 Number of bombs in the game's board.
 
-- `uncovered_cells`
+- `uncovered_cells`<br />
 List of cells whose status is `Status.UNCOVERED`.
 
-- `is_over`
+- `is_over`<br />
 `True` if the game has been win or lost; `False` otherwise.
 
-- `outcome`
+- `outcome`<br />
 `None` if the game is not over; `Outcome.WIN` or `Outcome.LOST` otherwise.
 
-- `board`
-An instance of the Board class, representing the actual game's board.
+- `board`<br />
+An instance of the Board class, representing the actual game's board. **IMPORTANT**: the Board class has a board attribute itself, which is the actual data structure (a matrix); so, if you want to access the data matrix within the a Game instance *g*, use `g.board.board`.
 
 ### Cell
-- `value`
-- `status`
-- `row`
-- `col`
+- `value`<br />
+Before the board is compiled, it tells if a cell is a safe one (value == 's') or a bomb one (value == 'b').
+After the board is compiled, it tells if a cell is a bomb (value == 'b'), or how many bombs surround the cell itself, e.g. Suppose a Cell `c` has 3 bomb cells among its neighbors cell, then the value of the Cell is 3: `c.value == 3`.
+- `status`<br />
+Track the status of the cell; could be one of the 4 options of the Status Enum (see below).
+- `row`<br />
+Index of the row the cell is in.
+- `col`<br />
+Index of the column the cell is in.
 
 ### Board
-- `board`
-- `number_of_cells`
-- `number_of_bombs`
-- `number_of_safe_cells`
-- `rows`
-- `cols`
-- `get_cell(row, column)`
+- `board`<br />
+A matrix which represents the structure of the board. It's a root list of *n* children lists. Every child list represents a row; the len of a row is the number of columns.
+- `number_of_cells`<br />
+Total number of cells in the board.
+- `number_of_bombs`<br />
+Number of cells within the board, which value is 'b'.
+- `number_of_safe_cells`<br />
+Number of cells within the board, which are not bombs.
+- `rows`<br />
+Number of rows in the board.
+- `cols`<br />
+Number of columns in the board.
+- `get_cell(row, column)`<br />
+Returns the Cell object at coordinates (row, column).
 
 ### Status (Enum)
 Import it from `pymine.board`
+
+Keep in mind this is an Enum, so you're not suppose to instantiate it. The following attributes are class attributes (not instance attributes) so you use it as you'd do for a static method, like: `Status.COVERED` etc. 
+
 - `COVERED`
 - `UNCOVERED`
 - `MARKED_BOMB`
@@ -144,6 +159,9 @@ Import it from `pymine.board`
 
 ### Outcome (Enum)
 Import it from `pymine.game`
+
+This too is an Enum: mind what we said for the Status class above.
+
 - `WIN`
 - `LOST`
 
